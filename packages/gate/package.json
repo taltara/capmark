@@ -1,0 +1,70 @@
+{
+  "name": "dsh-capmark-gate",
+  "version": "0.1.0",
+  "description": "Hold a DeepSeek Harness agent to a capmark capability manifest: mask its tools and judge every call.",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "capabilities",
+    "permissions",
+    "security"
+  ],
+  "license": "MIT",
+  "author": "talosteam",
+  "homepage": "https://github.com/taltara/capmark/tree/main/packages/gate#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taltara/capmark.git",
+    "directory": "packages/gate"
+  },
+  "bugs": {
+    "url": "https://github.com/taltara/capmark/issues"
+  },
+  "type": "module",
+  "main": "./src/bundle.ts",
+  "types": "./src/bundle.ts",
+  "exports": {
+    ".": "./src/bundle.ts"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "capmark": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsdown": "^0.15.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "main": "./lib/bundle.js",
+    "types": "./lib/bundle.d.ts",
+    "exports": {
+      ".": {
+        "types": "./lib/bundle.d.ts",
+        "default": "./lib/bundle.js"
+      }
+    },
+    "dependencies": {
+      "capmark": "^0.1.0"
+    }
+  }
+}

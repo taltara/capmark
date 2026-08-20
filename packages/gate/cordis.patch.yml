@@ -1,0 +1,8 @@
+# Inert until configured. A gate with no manifest denies every call in strict
+# mode, so this ships disabled rather than silently muting an agent on install.
+- insert:
+    - id: capmark-gate
+      name: dsh-capmark-gate
+      disabled: true
+      config:
+        strict: true

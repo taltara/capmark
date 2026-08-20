@@ -101,7 +101,25 @@ the docs never mentioned.
 Format version `0.1`; expect it to move.
 
 - `packages/capmark` — parser, linter, vocabulary, tool-mask compiler, CLI. Zero dependencies.
+- `packages/gate` — `dsh-capmark-gate`, the reference enforcer for DeepSeek Harness ([readme](packages/gate/README.md))
 - `packages/probe` — measurement instrument; boots against a real profile to capture live tool schemas. Not shipped.
+
+## Enforcement
+
+`packages/gate` holds a live agent to a manifest. Measured on a booted rc.7
+harness with a manifest granting `fs:read` and forbidding `proc:spawn`:
+
+```
+tools visible: 25 -> 4
+bash         deny  - reader declares `never proc:spawn`, and `bash` is part of it
+write        deny  - reader declares no capability covering `write`
+read         allow
+```
+
+It does **not** sandbox a plugin's own code — `apply()` runs in-process with
+full Node privileges before any tool call exists. A manifest governs what an
+*agent* may call. That limit is stated in the gate's readme rather than left for
+someone to discover.
 
 ## Develop
 

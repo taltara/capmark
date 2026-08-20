@@ -27,6 +27,25 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)
 
+  packages/gate:
+    dependencies:
+      capmark:
+        specifier: workspace:*
+        version: link:../capmark
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.1
+      tsdown:
+        specifier: ^0.15.6
+        version: 0.15.12(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)
+
   packages/probe:
     dependencies:
       '@deepseek-ai/dsh-scope':

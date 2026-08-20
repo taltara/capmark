@@ -1,0 +1,48 @@
+{
+  "beforeCount": 25,
+  "afterCount": 4,
+  "after": ["read", "glob", "grep", "read_image"],
+  "masked": [
+    "bash",
+    "write",
+    "edit",
+    "job_output",
+    "job_list",
+    "job_kill",
+    "skill",
+    "ask_user_question",
+    "web_search",
+    "todo_write",
+    "get_goal",
+    "create_goal",
+    "update_goal",
+    "send_message",
+    "interrupt_agent",
+    "list_agents",
+    "workflow",
+    "ralph",
+    "exit_plan_mode",
+    "subagent",
+    "subagent_fork"
+  ],
+  "verdicts": {
+    "read": {
+      "kind": "allow"
+    },
+    "grep": {
+      "kind": "allow"
+    },
+    "bash": {
+      "kind": "deny",
+      "reason": "reader declares `never proc:spawn`, and `bash` is part of it"
+    },
+    "write": {
+      "kind": "deny",
+      "reason": "reader declares no capability covering `write`"
+    },
+    "web_search": {
+      "kind": "deny",
+      "reason": "reader declares no capability covering `web_search`"
+    }
+  }
+}
