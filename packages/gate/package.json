@@ -1,6 +1,6 @@
 {
   "name": "dsh-capmark-gate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Hold a DeepSeek Harness agent to a capmark capability manifest: mask its tools and judge every call.",
   "keywords": [
     "dsh-plugin",
@@ -46,7 +46,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "capmark": "workspace:*"
+    "capmark": "workspace:^0.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
@@ -62,9 +62,6 @@
         "types": "./lib/bundle.d.ts",
         "default": "./lib/bundle.js"
       }
-    },
-    "dependencies": {
-      "capmark": "^0.1.0"
     }
   }
 }

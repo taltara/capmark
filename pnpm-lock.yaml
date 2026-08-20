@@ -30,7 +30,7 @@ importers:
   packages/gate:
     dependencies:
       capmark:
-        specifier: workspace:*
+        specifier: workspace:^0.1.1
         version: link:../capmark
     devDependencies:
       '@types/node':

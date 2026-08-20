@@ -1,6 +1,6 @@
 {
   "name": "capmark",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Capability manifests for AI agent plugins. Declare what a plugin may do, in Markdown, and check it.",
   "keywords": [
     "capabilities",
