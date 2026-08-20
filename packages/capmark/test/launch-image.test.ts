@@ -4,50 +4,75 @@ import { describe, expect, it } from 'vitest'
 import { measureMask, planMask } from '../src/mask.ts'
 import { parse } from '../src/parse.ts'
 
+interface Capture {
+  presets: { preset: string; schemas?: { name: string }[] }[]
+}
+
 const CAPTURE = JSON.parse(
   readFileSync(
     fileURLToPath(new URL('./fixtures-rc7-presets.json', import.meta.url)),
     'utf8',
   ),
-)
+) as Capture
 
-/** Exactly the three lines shown in assets/capmark-payload.png. */
-const M = (() => {
-  const r = parse(
-    '---\ncapmark: 0.1\nplugin: p\n---\n```cap\ngrant fs:read\ngrant net:fetch\nnever proc:spawn\n```\n\nx\n',
-  )
-  if (!r.ok) throw new Error('bad')
-  return r.manifest
+/** Exactly the three lines printed on assets/capmark-payload.png. */
+const MANIFEST = (() => {
+  const result = parse(`---
+capmark: 0.1
+plugin: p
+---
+\`\`\`cap
+grant fs:read
+grant net:fetch
+never proc:spawn
+\`\`\`
+
+Reads the workspace and calls one host.
+`)
+  if (!result.ok) throw new Error('image manifest did not parse')
+  return result.manifest
 })()
 
+function schemasFor(id: string): { name: string }[] {
+  const found = CAPTURE.presets.find((p) => p.preset === id)?.schemas
+  if (!found) throw new Error(`fixture has no schemas for ${id}`)
+  return found
+}
+
+/**
+ * The launch image quotes numbers. If the code moves and the picture does not,
+ * the picture becomes a false claim that nothing else in the suite would catch.
+ */
 describe('the numbers printed on the launch image', () => {
-  for (const [id, tools, before, after, cut] of [
-    ['standard', 25, 25567, 2724, '89.3'],
-    ['code', 26, 26510, 3667, '86.2'],
-    ['cordis', 32, 33055, 2724, '91.8'],
-  ] as const) {
-    it(`${id} row is exactly right`, () => {
-      const s = CAPTURE.presets.find((p: any) => p.preset === id).schemas
-      const m = measureMask(
-        s,
+  const rows = [
+    { id: 'standard', tools: 25, before: 25567, after: 2724, cut: '89.3' },
+    { id: 'code', tools: 26, before: 26510, after: 3667, cut: '86.2' },
+    { id: 'cordis', tools: 32, before: 33055, after: 2724, cut: '91.8' },
+  ] as const
+
+  for (const row of rows) {
+    it(`the ${row.id} row is exactly what the image says`, () => {
+      const schemas = schemasFor(row.id)
+      const saving = measureMask(
+        schemas,
         planMask(
-          M,
-          s.map((x: any) => x.name),
+          MANIFEST,
+          schemas.map((s) => s.name),
         ),
       )
-      expect(m.beforeCount).toBe(tools)
-      expect(m.beforeBytes).toBe(before)
-      expect(m.afterBytes).toBe(after)
-      expect((m.savedFraction * 100).toFixed(1)).toBe(cut)
+      expect(saving.beforeCount).toBe(row.tools)
+      expect(saving.beforeBytes).toBe(row.before)
+      expect(saving.afterBytes).toBe(row.after)
+      expect((saving.savedFraction * 100).toFixed(1)).toBe(row.cut)
     })
   }
-  it('standard leaves exactly 5 tools, the headline number', () => {
-    const s = CAPTURE.presets.find((p: any) => p.preset === 'standard').schemas
-    expect(
-      planMask(
-        M,
-        s.map((x: any) => x.name),
-      ).kept,
-    ).toHaveLength(5)
+
+  it('leaves exactly the 5 tools the headline claims', () => {
+    const schemas = schemasFor('standard')
+    const plan = planMask(
+      MANIFEST,
+      schemas.map((s) => s.name),
+    )
+    expect(plan.kept).toHaveLength(5)
   })
 })
