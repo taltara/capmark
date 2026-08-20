@@ -1,57 +1,61 @@
-Installing an AI agent plugin runs a stranger's code with your permissions. It
-can read your files, spend your credentials, and reach the network.
+Your AI agent is carrying 25 tools into every single request.
 
-Today the only thing standing between you and that is a README and your own
-reading of it.
+6,400 tokens. Re-sent on every turn, of every session, forever.
 
-So I built capmark: a plugin declares what it may do, in Markdown, and a checker
-holds it to that.
+Most of them it will never call.
+
+I built capmark to fix a security problem and accidentally fixed a cost one.
+
+Here's the whole idea. A plugin declares what it's allowed to do, in Markdown:
 
   grant fs:read scope=workspace
   grant net:fetch
   never proc:spawn
 
-One rule keeps it honest — every capability has to name a mechanism that
+Three lines. Now you get four things.
+
+→ 89% smaller tool payload
+Declared capabilities mean the agent only sees tools it can actually use.
+25 tools became 5. 25,567 bytes became 2,724. Measured on a live harness.
+
+→ Real enforcement, not vibes
+Blocked tools are blocked. There's no rephrasing your way to a shell once the
+shell is off the table.
+
+→ Know before you install
+See exactly what a plugin is asking for while saying no is still free.
+
+→ Readable by humans, on day one
+It's Markdown. Any tool that's never heard of capmark still renders a perfectly
+legible security README.
+
+The rule that makes it work: every capability must name a mechanism that
 actually stops it.
 
-That rule came from a real finding in the DeepSeek Harness community: a deny
-rule on "rm -rf" was walked around with "rm" followed by "rmdir" in the same
-run. Patterns deny spellings. Capabilities deny outcomes.
+That came from a real incident. A deny rule on "rm -rf" got walked around with
+"rm" then "rmdir" in the same run.
 
-Blocking a whole tool qualifies — there is no rephrasing your way to a shell
-once the shell is off the table. A host allowlist does not, because nothing
-checks the URL before the request goes out. So the linter says so out loud
-rather than letting it pass for a wall.
+Patterns deny spellings. Capabilities deny outcomes.
 
-A permission system that quietly overstates itself is worse than none, because
-people stop reading the code.
+So a host allowlist doesn't count — nothing checks the URL before the request
+goes out. capmark lints it as advisory instead of letting it pass for a wall.
 
-Then the surprise.
+A permission system that quietly overstates itself is worse than none. People
+stop reading the code.
 
-Tool schemas are re-sent on every single request, so a tool an agent can never
-call is paid for on every turn of every session. I measured a running harness:
-the default agent carries 25 tools in 25,567 bytes — roughly 6,400 tokens, every
-request. A plugin that only reads files and makes one network call justifies 5
-of them.
+Last thing, and it's the part I'd actually tell a junior engineer.
 
-An 89% cut to the tool payload, from a file written for security reasons.
+Every number above came from booting the real thing and measuring it.
 
-I went in thinking this was a safety feature. I came out thinking the cost
-argument might be the easier sell.
-
-One more thing worth sharing. Every number here came from booting a real harness
-and measuring it, not from arithmetic — and that is the only reason they are
-right. My paper calculation said 89.7% for one configuration. The live run said
-86.2%, because one tool turns out to be unmaskable. The same habit caught three
-other bugs that my unit tests sailed straight through.
+My arithmetic said 89.7%. The live run said 86.2% — one tool turned out to be
+unmaskable. That same habit caught three more bugs my unit tests slept right
+through.
 
 Measure the running thing.
 
-Open source, MIT:
-https://github.com/taltara/capmark
+Free, open source, MIT → https://github.com/taltara/capmark
 
 Built alongside a visual orchestrator for the same harness — drag models and
-tools onto a canvas, and it compiles to a real config overlay:
-https://github.com/taltara/mddl-harness
+tools onto a canvas, get a real config file out → https://github.com/taltara/mddl-harness
 
 #AIAgents #OpenSource #DeveloperTools #AISecurity #LLM
