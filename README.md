@@ -55,13 +55,46 @@ warning  advisory-scope  scope on `net:fetch` is recorded and audited, but
 A permission system that quietly overstates itself is worse than none, because
 people stop reading the code.
 
+## Check one
+
+```sh
+npx capmark lint ./CAP.md
+```
+
+Exit 0 clean, 1 findings, 2 could not run. `--json` for CI.
+
+## The saving nobody asks a permission system for
+
+Tool schemas are re-sent on every request, so a tool an agent may never call is
+paid for on every turn of every session. A manifest already says which those
+are, and `tools.restrict()` in rc.7 takes exactly the mask that falls out of it.
+
+Measured against a booted `@deepseek-ai/dsh` `0.1.0-rc.7` web profile — real
+schemas captured from the running registry, not estimates:
+
+| preset | tools | schema bytes | with a `fs:read` + `net:fetch` manifest | cut |
+|---|---|---|---|---|
+| `standard` (default) | 25 | 25,567 | 5 tools, 2,724 B | **89.3%** |
+| `code` | 26 | 26,510 | 5 tools, 2,724 B | 89.7% |
+| `cordis` | 32 | 33,055 | 5 tools, 2,724 B | 91.8% |
+
+Read honestly: that is the tool payload, not the whole request, and it applies
+to an agent genuinely scoped to what it declared — masking a general-purpose
+agent down to one plugin's grants would break it, which is why the report
+refuses to score a mask that leaves nothing callable. We make no latency claim,
+because we have not measured latency. See [the benchmark](packages/capmark/bench/README.md)
+to reproduce it.
+
 ## Status
 
-Early. The vocabulary is twelve capabilities, each bound to tool names read off
-an installed `@deepseek-ai/dsh` `0.1.0-rc.7` profile rather than from docs.
+Early. The vocabulary is fourteen capabilities, each bound to tool names captured from
+a booted `@deepseek-ai/dsh` `0.1.0-rc.7` profile rather than read from docs —
+two of them (`code:run`, `workflow:run`) exist because measuring turned up tools
+the docs never mentioned.
 Format version `0.1`; expect it to move.
 
-- `packages/capmark` — parser, linter, vocabulary. Zero dependencies.
+- `packages/capmark` — parser, linter, vocabulary, tool-mask compiler, CLI. Zero dependencies.
+- `packages/probe` — measurement instrument; boots against a real profile to capture live tool schemas. Not shipped.
 
 ## Develop
 

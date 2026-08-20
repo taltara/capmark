@@ -26,11 +26,38 @@
   },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsdown"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "tsdown": "^0.15.6"
+  },
+  "bin": {
+    "capmark": "./lib/bin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taltara/capmark.git",
+    "directory": "packages/capmark"
+  },
+  "homepage": "https://github.com/taltara/capmark#readme",
+  "bugs": {
+    "url": "https://github.com/taltara/capmark/issues"
+  },
+  "publishConfig": {
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "bin": {
+      "capmark": "./lib/bin.js"
+    },
+    "exports": {
+      ".": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.js"
+      }
+    }
   }
 }
