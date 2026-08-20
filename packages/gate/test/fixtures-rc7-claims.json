@@ -1,0 +1,21 @@
+{
+  "globalViewIsEmpty": {
+    "count": 0
+  },
+  "scopedViewHasTools": {
+    "count": 26
+  },
+  "restrictNamingRunCode": {
+    "threw": true,
+    "message": "Error: tools.restrict() cannot name reserved Code Mode presentation transport \"run_code\"; restrict end-capability tools instead"
+  },
+  "runCodeSurvivesMask": {
+    "after": ["read", "run_code"],
+    "stillPresent": true
+  },
+  "restrictionsIntersect": {
+    "afterNarrow": ["read", "grep"],
+    "afterAttemptedWiden": ["read", "grep"],
+    "widened": false
+  }
+}

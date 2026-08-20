@@ -8,7 +8,8 @@
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./gate-check": "./src/gate-check.js"
+    "./gate-check": "./src/gate-check.js",
+    "./claims": "./src/claims.js"
   },
   "dsh": {
     "bundle": {
