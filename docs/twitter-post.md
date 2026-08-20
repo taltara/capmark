@@ -117,12 +117,13 @@ github.com/taltara/capmark
 
 ## Before you post
 
-**Attach media.** A post with an image gets substantially more engagement than
-text alone, and this project has an unusually good screenshot: the linter
-refusing to let a manifest overstate itself. Run this and screenshot the
-terminal.
+**Attach the image.** `assets/capmark-payload.png` (1600x900, sized for X) shows
+the three-line manifest beside what it removes, plus the full table. Every
+number on it is asserted by a test against the live capture, so it cannot drift
+away from the truth as the code changes.
 
-The commands that produce good visuals are in the section below.
+An alternative screenshot - the linter refusing to let a manifest overstate
+itself - is in the section below if you would rather lead with that.
 
 **Timing.** Tuesday to Thursday, 9-11am or 1-3pm US Eastern, is when the
 developer audience is densest. Avoid Friday afternoon and weekends.
