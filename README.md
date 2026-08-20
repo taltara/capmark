@@ -75,7 +75,7 @@ schemas captured from the running registry, not estimates:
 | preset | tools | schema bytes | with a `fs:read` + `net:fetch` manifest | cut |
 |---|---|---|---|---|
 | `standard` (default) | 25 | 25,567 | 5 tools, 2,724 B | **89.3%** |
-| `code` | 26 | 26,510 | 5 tools, 2,724 B | 89.7% |
+| `code` | 26 | 26,510 | 6 tools, 3,667 B | 86.2% |
 | `cordis` | 32 | 33,055 | 5 tools, 2,724 B | 91.8% |
 
 Read honestly: that is the tool payload, not the whole request, and it applies
@@ -84,6 +84,13 @@ agent down to one plugin's grants would break it, which is why the report
 refuses to score a mask that leaves nothing callable. We make no latency claim,
 because we have not measured latency. See [the benchmark](packages/capmark/bench/README.md)
 to reproduce it.
+
+The `code` row keeps six tools rather than five because `run_code` cannot be
+masked: the registry re-adds the Code Mode transport after restrictions apply,
+and `tools.restrict()` throws if you name it. Enforcement is unaffected — a
+sub-dispatch still passes the policy waterfall — but the payload keeps it, and
+the number says so. We found this by masking a live harness; the paper
+calculation had claimed 89.7%.
 
 ## Status
 

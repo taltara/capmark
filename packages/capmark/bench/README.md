@@ -45,5 +45,10 @@ Read that honestly:
   task-scoped agent that genuinely only needs what it declared.
 - **Tokens are bytes/4.** The real count comes from the provider's tokenizer.
   Bytes are the honest unit here; tokens are a convenience.
+- **The compiler is checked against the harness, not against itself.** The
+  probe applies a real `tools.restrict()` and re-reads the registry; a test
+  asserts `planMask` reproduces those exact bytes for every preset. That test is
+  how we learned `run_code` is unmaskable and that the `code` preset saves
+  86.2%, not the 89.7% the offline calculation claimed.
 - **No latency claim.** A smaller prompt should reach a first token sooner, but
   we have not measured that, so we do not say it.

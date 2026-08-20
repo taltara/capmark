@@ -1,16 +1,12 @@
 /**
- * Dumps the tool schemas a DSH profile actually sends to the model.
+ * Measures what a tool mask actually removes, on a running harness.
  *
- * The naive reading — `ctx.tools.schemas()` at boot — returns nothing, and the
- * empty answer is the interesting part: model-facing tools are not registered
- * globally. They are composed per agent from an agent preset, so the payload a
- * request carries depends on which preset the session runs on. Measuring the
- * global registry would have quietly reported zero and looked like a working
- * benchmark.
- *
- * So this mints a throwaway scope per preset, mounts the preset into it the
- * same way a real session would, and reads the scoped view. Nothing here is a
- * shipped plugin — it is the instrument the benchmark numbers come from.
+ * Reading the source suggests preset tools are maskable: an agent's own-layer
+ * registrations bypass the admit check, but a preset's tools live in the
+ * standing composition, which is a PARENT of the agent scope, so they arrive
+ * inherited. Suggests is not the same as does, and the whole efficiency claim
+ * rests on the answer — so this calls `tools.restrict()` for real and re-reads
+ * the schemas afterwards.
  */
 
 import { writeFileSync } from 'node:fs'
@@ -19,6 +15,16 @@ import { createScope } from '@deepseek-ai/dsh-scope'
 export const inject = ['tools', 'agentPresets']
 
 export const name = 'capmark-probe'
+
+/** What a read-only plugin would justify: fs:read plus net:fetch. */
+const KEEP = new Set([
+  'read',
+  'read_image',
+  'glob',
+  'grep',
+  'web_fetch',
+  'web_search',
+])
 
 export function apply(ctx, config) {
   const out = config?.out
@@ -30,31 +36,34 @@ export function apply(ctx, config) {
     const measured = []
 
     for (const preset of presets) {
-      // A broken preset resolves but will not mount; record why rather than
-      // dropping it, so a shrinking preset list can never pass for a clean run.
       const key = Symbol(`capmark-probe:${preset.id}`)
       const scope = createScope(ctx, key)
+      const entry = { preset: preset.id }
       try {
         await ctx.agentPresets.mount(scope.ctx, preset.id)
-        const schemas = ctx.tools.schemas(key)
-        measured.push({
-          preset: preset.id,
-          count: schemas.length,
-          schemas,
-        })
+        const before = ctx.tools.schemas(key)
+        entry.before = { count: before.length, schemas: before }
+
+        const allow = before.map((s) => s.name).filter((n) => KEEP.has(n))
+        try {
+          scope.ctx.tools.restrict({ allow })
+          const after = ctx.tools.schemas(key)
+          entry.after = { count: after.length, names: after.map((s) => s.name) }
+          entry.afterBytes = Buffer.byteLength(JSON.stringify(after))
+        } catch (error) {
+          // A refused restriction is the finding, not an error to swallow.
+          entry.restrictError = String(error)
+        }
       } catch (error) {
-        measured.push({ preset: preset.id, error: String(error) })
+        entry.error = String(error)
       }
+      measured.push(entry)
     }
 
     writeFileSync(
       out,
       JSON.stringify(
-        {
-          defaultPreset: ctx.agentPresets.defaultId,
-          globalCount: ctx.tools.schemas().length,
-          presets: measured,
-        },
+        { defaultPreset: ctx.agentPresets.defaultId, presets: measured },
         null,
         2,
       ),

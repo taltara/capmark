@@ -13,7 +13,26 @@
 import type { Manifest } from './parse.ts'
 import { lookup, unclaimedTools } from './vocabulary.ts'
 
-/** The `ToolRestriction` shape `tools.restrict()` accepts. */
+/**
+ * Tools a mask cannot remove.
+ *
+ * `run_code` is the Code Mode presentation transport. The registry re-adds it
+ * to every non-native view after restrictions are applied, and `restrict()`
+ * throws outright if you so much as name it. Modelling it as maskable
+ * overstated the saving on the `code` preset by 3.5 points, which is exactly
+ * the kind of error a paper calculation makes and a live harness does not.
+ *
+ * It is not a hole: a Code Mode sub-dispatch still passes `tools/pre-execute`,
+ * so end capabilities stay enforced even though the transport is always there.
+ */
+export const UNMASKABLE: ReadonlySet<string> = new Set(['run_code'])
+
+/**
+ * The `ToolRestriction` shape `tools.restrict()` accepts.
+ *
+ * Never contains an {@link UNMASKABLE} name — passing one throws rather than
+ * being ignored, so filtering here is what keeps the call from failing.
+ */
 export interface ToolMask {
   readonly allow: readonly string[]
 }
@@ -70,16 +89,21 @@ export function planMask(
   const kept: string[] = []
   const dropped: string[] = []
   for (const tool of registered) {
-    if (allowed.has(tool) || unclaimedSet.has(tool)) kept.push(tool)
-    else dropped.push(tool)
+    // An unmaskable tool stays visible whatever the manifest says, so it is
+    // kept — reporting it as dropped would promise a removal that never happens.
+    if (allowed.has(tool) || unclaimedSet.has(tool) || UNMASKABLE.has(tool)) {
+      kept.push(tool)
+    } else dropped.push(tool)
   }
 
+  const maskable = kept.filter((t) => !UNMASKABLE.has(t))
+
   return {
-    mask: { allow: kept },
+    mask: { allow: maskable },
     kept,
     dropped,
     unclaimed,
-    empty: registered.length > 0 && kept.length === 0,
+    empty: registered.length > 0 && maskable.length === 0,
   }
 }
 
