@@ -6,6 +6,12 @@
  * because the Agent Plugins 1.0.0 schema is closed — client data MUST live
  * under a reverse-domain key in `extensions` — so that is where a manifest has
  * to go for a plugin that ships to that spec rather than to npm alone.
+ *
+ * That spec also says extension values MUST be objects, so the manifest text
+ * is the `manifest` member of one rather than the value itself. A bare string
+ * would be a conformance violation, and a client is required to ignore
+ * namespaces it does not implement without validating them — meaning nothing
+ * would have told us.
  */
 
 import { readFileSync } from 'node:fs'
@@ -57,7 +63,11 @@ export function discover(packageDir: string): Discovery {
     return { kind: 'absent' }
   }
 
-  const embedded = pkg.extensions?.['dev.capmark']
+  const slot = pkg.extensions?.['dev.capmark']
+  if (typeof slot !== 'object' || slot === null || Array.isArray(slot)) {
+    return { kind: 'absent' }
+  }
+  const embedded = (slot as { manifest?: unknown }).manifest
   if (typeof embedded !== 'string') return { kind: 'absent' }
 
   const result = parse(embedded)

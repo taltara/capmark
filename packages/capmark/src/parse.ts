@@ -38,6 +38,16 @@ export interface Manifest {
   readonly approvals: readonly RequireApproval[]
   /** Prose outside the ```cap fences — read by humans and by the model. */
   readonly prose: string
+  /**
+   * The manifest exactly as written.
+   *
+   * Kept because compiling to another format has to restate the manifest, and
+   * rebuilding it from the parsed parts loses the author's structure — the
+   * headings that introduced each fenced block survive with their contents
+   * gone. Embedding the original also means what ships in a `plugin.json` is
+   * byte-for-byte what was reviewed.
+   */
+  readonly source: string
 }
 
 export interface ParseError {
@@ -251,6 +261,7 @@ export function parse(source: string): ParseResult {
       nevers: out.nevers,
       approvals: out.approvals,
       prose: prose.join('\n').trim(),
+      source,
     },
   }
 }

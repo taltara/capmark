@@ -1,9 +1,8 @@
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { parse } from 'capmark'
+import { discover, parse } from 'capmark'
 import { describe, expect, it } from 'vitest'
-import { discover } from '../src/discover.ts'
 import { policyFor } from '../src/enforce.ts'
 import {
   apply,
@@ -211,7 +210,10 @@ describe('discover', () => {
     const d = dir()
     writeFileSync(
       join(d, 'package.json'),
-      JSON.stringify({ name: 'p', extensions: { 'dev.capmark': GOOD } }),
+      JSON.stringify({
+        name: 'p',
+        extensions: { 'dev.capmark': { manifest: GOOD } },
+      }),
     )
     const found = discover(d)
     expect(found.kind).toBe('found')

@@ -48,6 +48,57 @@ CAP.md:7  warning advisory-scope               scope on `net:fetch` is recorded 
 CAP.md:8  error   grant-never-conflict         `proc:spawn` is granted on line 6 and forbidden here
 ```
 
+## Before you install something
+
+A gate holds an *agent* to a manifest. It cannot hold a *plugin*: `apply()` runs
+in-process with full privileges the moment the plugin loads, before any tool
+call exists. The last point where that is still a choice is the install.
+
+```sh
+npx capmark review ./node_modules/some-plugin
+```
+
+```
+build-helper
+  manifest: ./node_modules/build-helper/CAP.md
+  grants:
+     fs:read            Read files and search the filesystem.
+     fs:write           Create, edit, or overwrite files.
+   ! proc:spawn         Run shell commands.
+  forbids: credentials:read
+
+  rationale:
+    Runs the project's own test command and writes coverage output into the
+    workspace. It never touches the credential store.
+```
+
+It reports and never refuses. Whether an unmanifested plugin is acceptable is a
+deployment decision, and today almost none carry a manifest.
+
+## Say it where other specs expect it
+
+```sh
+npx capmark compile ./CAP.md --target dsh
+npx capmark compile ./CAP.md --target agent-plugins
+npx capmark compile ./CAP.md --target skill
+```
+
+Each target is a field some other specification actually defines:
+
+- **dsh** — a Cordis overlay row configuring `dsh-capmark-gate`.
+- **agent-plugins** — the `extensions["dev.capmark"]` block. The 1.0.0 schema is
+  closed, and extension values MUST be objects, so the manifest is the
+  `manifest` member of one rather than a bare string.
+- **skill** — `allowed-tools`, a real (experimental) Agent Skills field, plus
+  `metadata` keys, the spec's slot for properties it does not define.
+
+There is deliberately **no MCP target**. Capability declarations plainly belong
+near tool definitions, but the MCP specification has no field that carries them
+today, and emitting one would put a security claim somewhere nothing reads.
+
+The embedded manifest is the original bytes, not a reconstruction — so what
+ships in a `plugin.json` is what was reviewed.
+
 ## The rule that keeps this honest
 
 Every capability in the vocabulary must name a mechanism that actually stops it.
