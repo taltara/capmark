@@ -59,7 +59,8 @@
       "includes": [
         "packages/capmark/src/cli.ts",
         "packages/capmark/src/bin.ts",
-        "packages/capmark/bench/**"
+        "packages/capmark/bench/**",
+        "scripts/**"
       ],
       "linter": {
         "rules": {
