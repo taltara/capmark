@@ -37,7 +37,9 @@
         "noExplicitAny": "error",
         "noConsole": {
           "level": "error",
-          "options": { "allow": ["warn", "error"] }
+          "options": {
+            "allow": ["warn", "error"]
+          }
         }
       },
       "complexity": {
@@ -51,5 +53,21 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "packages/capmark/src/cli.ts",
+        "packages/capmark/src/bin.ts",
+        "packages/capmark/bench/**"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
 }
