@@ -1,5 +1,7 @@
 export type { Finding, Severity } from './lint.ts'
 export { hasErrors, lint } from './lint.ts'
+export type { MaskPlan, MaskSaving, SchemaLike, ToolMask } from './mask.ts'
+export { allowedTools, measureMask, planMask } from './mask.ts'
 export type {
   Grant,
   Manifest,

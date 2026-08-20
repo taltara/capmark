@@ -88,7 +88,14 @@ export const CAPABILITIES: readonly Capability[] = [
     id: 'subagent:spawn',
     summary: 'Start and steer subagents.',
     enforcement: 'pre-execute',
-    tools: ['interrupt_agent', 'send_message', 'report'],
+    tools: [
+      'subagent',
+      'subagent_fork',
+      'list_agents',
+      'send_message',
+      'interrupt_agent',
+      'report',
+    ],
     scopes: [],
     scopeIsAdvisory: false,
   },
@@ -140,7 +147,34 @@ export const CAPABILITIES: readonly Capability[] = [
     id: 'goal:manage',
     summary: 'Write goals and todo lists.',
     enforcement: 'pre-execute',
-    tools: ['create_goal', 'get_goal', 'update_goal', 'todo_write'],
+    tools: [
+      'create_goal',
+      'get_goal',
+      'update_goal',
+      'todo_write',
+      'exit_plan_mode',
+    ],
+    scopes: [],
+    scopeIsAdvisory: false,
+  },
+  {
+    id: 'code:run',
+    summary: 'Execute a program in-process that can dispatch other tools.',
+    // Code Mode is not a hole in the gate: a sub-dispatch goes through
+    // `scheduler.prepare` -> `prepareScheduledExecution` -> the
+    // `tools/pre-execute` waterfall, exactly like a model-direct call. Verified
+    // by reading rc.7, because the opposite would have made every other
+    // capability here decorative.
+    enforcement: 'pre-execute',
+    tools: ['run_code'],
+    scopes: [],
+    scopeIsAdvisory: false,
+  },
+  {
+    id: 'workflow:run',
+    summary: 'Drive multi-step workflow and repeat loops.',
+    enforcement: 'pre-execute',
+    tools: ['workflow', 'ralph'],
     scopes: [],
     scopeIsAdvisory: false,
   },

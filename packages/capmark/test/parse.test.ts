@@ -297,6 +297,8 @@ describe('vocabulary', () => {
   })
 
   it('names tools no capability claims, rather than defaulting either way', () => {
-    expect(unclaimedTools(['bash', 'ralph', 'read'])).toEqual(['ralph'])
+    expect(unclaimedTools(['bash', 'some_plugin_tool', 'read'])).toEqual([
+      'some_plugin_tool',
+    ])
   })
 })

@@ -1,0 +1,20 @@
+{
+  "name": "dsh-capmark-probe",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Measurement instrument: dumps the live tool schemas a DSH profile sends to the model. Not a shipped plugin.",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-scope": "*"
+  }
+}

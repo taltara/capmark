@@ -20,7 +20,12 @@ export interface Finding {
 }
 
 /** Grants that hand over the machine, and so deserve a written reason. */
-const HIGH_RISK = new Set(['proc:spawn', 'plugins:manage', 'credentials:read'])
+const HIGH_RISK = new Set([
+  'proc:spawn',
+  'code:run',
+  'plugins:manage',
+  'credentials:read',
+])
 
 export function lint(manifest: Manifest, packageName?: string): Finding[] {
   const findings: Finding[] = []
