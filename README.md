@@ -67,10 +67,12 @@ Exit 0 clean, 1 findings, 2 could not run. `--json` for CI.
 
 Tool schemas are re-sent on every request, so a tool an agent may never call is
 paid for on every turn of every session. A manifest already says which those
-are, and `tools.restrict()` in rc.7 takes exactly the mask that falls out of it.
+are, and `tools.restrict()` takes exactly the mask that falls out of it.
 
 Measured against a booted `@deepseek-ai/dsh` `0.1.0-rc.7` web profile — real
-schemas captured from the running registry, not estimates:
+schemas captured from the running registry, not estimates. Re-checked against
+`0.1.1-rc.2`, where the `standard`, `code` and `cordis` compositions carry the
+same rows, so these figures still stand:
 
 | preset | tools | schema bytes | with a `fs:read` + `net:fetch` manifest | cut |
 |---|---|---|---|---|
@@ -94,8 +96,14 @@ calculation had claimed 89.7%.
 
 ## Status
 
-Early. The vocabulary is fourteen capabilities, each bound to tool names captured from
-a booted `@deepseek-ai/dsh` `0.1.0-rc.7` profile rather than read from docs —
+Early. Verified against `@deepseek-ai/dsh` `0.1.0-rc.7` and `0.1.1-rc.2`. The three
+packages the checks rely on — `dsh-tools`, `dsh-agent-presets`, `dsh-scope` —
+are byte-identical between those versions, so the seams are the same code at
+both. `0.1.1-rc.2` adds one tool package, and it registers a name the
+vocabulary already covered.
+
+The vocabulary is fourteen capabilities, each bound to tool names captured from
+a booted `@deepseek-ai/dsh` profile rather than read from docs —
 two of them (`code:run`, `workflow:run`) exist because measuring turned up tools
 the docs never mentioned.
 Format version `0.1`; expect it to move.

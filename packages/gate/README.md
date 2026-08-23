@@ -5,7 +5,7 @@ capability manifest: mask the tools it can see, and judge every call it makes.
 
 ## What it does
 
-Two seams, both verified against `@deepseek-ai/dsh` `0.1.0-rc.7`:
+Two seams, both verified against `@deepseek-ai/dsh` `0.1.0-rc.7` and `0.1.1-rc.2`:
 
 - **`tools.restrict()`** narrows what the agent can see. This is where the
   payload saving comes from — a tool absent from the view is absent from the

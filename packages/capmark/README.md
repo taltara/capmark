@@ -131,6 +131,9 @@ Full numbers and how to reproduce them:
 
 Early, and the format version says so. Vocabulary is fourteen capabilities, each
 bound to tool names captured from a running harness rather than read from docs.
+Verified against `0.1.0-rc.7` and `0.1.1-rc.2`: the three packages the checks
+rely on are byte-identical between them, and the one new tool package in
+`0.1.1-rc.2` registers a name the vocabulary already covered.
 
 ## License
 
