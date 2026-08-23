@@ -1,44 +1,38 @@
 # capmark
 
-Capability manifests for AI agent plugins. A plugin declares what it may do, in
-Markdown, and a checker holds it to that.
+**Capability manifests for AI agent plugins.** A plugin declares what it may do,
+and a checker holds it to that.
 
-Installing a plugin runs someone else's code with your permissions — it can read
-your files, spend your credentials, and reach the network. Today the only thing
-between you and that is a README and your own reading of it. Scanners look for
-known-bad code after the fact. capmark is the other half: the plugin says what
-it needs up front, in a form a machine can check.
+I audited sixteen published agent plugins. Ten read your filesystem, two open
+network connections, and none of them say so anywhere a machine can check. Not
+one is doing anything wrong — that is the problem. The only way to find out was
+to read their source.
 
-```markdown
----
-capmark: 0.1
-plugin: dsh-vision-toolkit
----
-
-# Capabilities
-
-​```cap
-grant fs:read scope=workspace
-grant net:fetch
-​```
-
-# Contracts
-
-​```cap
-never proc:spawn
-require approval for fs:read
-​```
+```sh
+npx capmark infer ./node_modules/some-plugin > CAP.md   # draft it
+npx capmark review ./node_modules/some-plugin           # read it before installing
+npx capmark lint ./CAP.md                               # hold it to it
 ```
+
+`infer` reads what a plugin already declares — the services it injects, the Node
+builtins it imports — and drafts a manifest with the evidence beside each line:
+
+```
+grant fs:read       # imports `node:fs`
+grant proc:spawn    # injects `shell`
+never credentials:read
+```
+
+That is the whole format. It lives in a fenced `cap` block inside an ordinary
+Markdown file with YAML frontmatter naming the package, so a plugin ships one
+`CAP.md` and every tool that has never heard of capmark still renders a legible
+security README.
 
 It is Markdown first. A reader that has never heard of capmark still renders a
 legible security README — the worst case for an unsupported manifest is
 documentation.
 
-## Use
-
-```sh
-npx capmark lint ./CAP.md
-```
+## What the checker catches
 
 Exit 0 clean, 1 findings, 2 could not run. `--json` for CI.
 
@@ -48,20 +42,10 @@ CAP.md:7  warning advisory-scope               scope on `net:fetch` is recorded 
 CAP.md:8  error   grant-never-conflict         `proc:spawn` is granted on line 6 and forbidden here
 ```
 
-## Start from what the plugin already declares
+## Why a draft, not a blank file
 
-Nobody writes a manifest from a blank file. `infer` reads the services a plugin
-injects — a plain array at module level, no execution involved — and drafts one:
-
-```sh
-npx capmark infer ./node_modules/some-plugin > CAP.md
-```
-
-```
-grant plugins:manage  # injects `loader`
-```
-
-Every grant carries the evidence that suggested it — an injected service or a
+Nobody writes a manifest from scratch, which is how most formats die. Every
+grant carries the evidence that suggested it — an injected service or a
 Node builtin — so you can disagree with the reason rather than just the answer.
 
 Builtins matter more than they sound. Injecting the `fs` service is not the only

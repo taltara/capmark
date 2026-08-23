@@ -1,14 +1,21 @@
 {
   "name": "capmark",
-  "version": "0.3.0",
-  "description": "Capability manifests for AI agent plugins. Declare what a plugin may do, in Markdown, and check it.",
+  "version": "0.3.1",
+  "description": "Declare what an AI agent plugin may do, in Markdown, and check it. Drafts the manifest for you from what the plugin already declares.",
   "keywords": [
     "capabilities",
     "permissions",
     "agent",
+    "ai-agent",
     "plugin",
     "manifest",
-    "security"
+    "security",
+    "supply-chain",
+    "sandbox",
+    "dsh",
+    "deepseek-harness",
+    "agent-skills",
+    "mcp"
   ],
   "license": "MIT",
   "author": "talosteam",
