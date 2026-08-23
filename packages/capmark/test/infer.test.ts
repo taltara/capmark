@@ -134,3 +134,65 @@ describe('draft', () => {
     expect(draft(infer(dir))).toContain('# injects `shell`')
   })
 })
+
+describe('builtins, which bypass the service graph', () => {
+  it('proposes fs:read for a plugin that imports node:fs without injecting fs', () => {
+    // Ten of sixteen published plugins audited do exactly this. Reading only
+    // the service graph called them capability-free — a false security claim
+    // produced by the tool meant to prevent them.
+    const dir = pkg({
+      'package.json': '{"name":"scanner"}',
+      'lib/index.js':
+        'import { readFileSync } from "node:fs";\nconst inject = ["tools"];',
+    })
+    const result = infer(dir)
+    expect(result.injects).toEqual(['tools'])
+    expect(result.proposed.map((p) => p.capability)).toEqual(['fs:read'])
+    expect(result.proposed[0]?.evidence).toContain('node:fs')
+  })
+
+  it('treats raw sockets as network access', () => {
+    const dir = pkg({
+      'package.json': '{"name":"net"}',
+      'lib/index.js': 'require("node:net"); require("node:dns");',
+    })
+    expect(infer(dir).proposed.map((p) => p.capability)).toEqual(['net:fetch'])
+  })
+
+  it('treats child_process as a shell', () => {
+    const dir = pkg({
+      'package.json': '{"name":"spawner"}',
+      'lib/index.js': 'import "node:child_process";',
+    })
+    expect(infer(dir).proposed.map((p) => p.capability)).toEqual(['proc:spawn'])
+  })
+
+  it('does not double-propose when a service and a builtin agree', () => {
+    const dir = pkg({
+      'package.json': '{"name":"both"}',
+      'lib/index.js': 'const inject = ["shell"]; import "node:child_process";',
+    })
+    expect(infer(dir).proposed.map((p) => p.capability)).toEqual(['proc:spawn'])
+  })
+
+  it('ignores builtins that imply no capability', () => {
+    const dir = pkg({
+      'package.json': '{"name":"quiet"}',
+      'lib/index.js': 'import "node:path"; import "node:url";',
+    })
+    expect(infer(dir).proposed).toEqual([])
+    expect(infer(dir).builtins).toEqual(['path', 'url'])
+  })
+
+  it('scans .mjs, since a package may ship its main as one', () => {
+    // dsh-mask ships index.mjs; a .js-only reader skipped the package entirely
+    // while reporting a confident empty result.
+    const dir = pkg({
+      'package.json': '{"name":"mjs","main":"./index.mjs"}',
+      'index.mjs': 'import "node:fs";',
+    })
+    const result = infer(dir)
+    expect(result.filesScanned).toBe(1)
+    expect(result.proposed.map((p) => p.capability)).toEqual(['fs:read'])
+  })
+})

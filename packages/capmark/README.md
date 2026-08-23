@@ -61,8 +61,15 @@ npx capmark infer ./node_modules/some-plugin > CAP.md
 grant plugins:manage  # injects `loader`
 ```
 
-Every grant carries the declaration that suggested it, so you can disagree with
-the reason rather than just the answer. It is a **draft**: static reading sees
+Every grant carries the evidence that suggested it — an injected service or a
+Node builtin — so you can disagree with the reason rather than just the answer.
+
+Builtins matter more than they sound. Injecting the `fs` service is not the only
+way to reach a disk: of sixteen published DSH plugins audited, **ten import
+`node:fs` directly while injecting no `fs` service**, and one opens raw sockets
+through `node:net`. A reader that followed only the service graph would call
+those plugins capability-free, which is a false security claim produced by the
+tool meant to prevent them. It is a **draft**: static reading sees
 what a plugin *can* reach, never what it does, and the emitted file says so in a
 comment that survives into the committed manifest. Services that carry authority
 capmark has no capability for are listed under **Not covered** rather than
