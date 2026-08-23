@@ -74,11 +74,26 @@ schemas captured from the running registry, not estimates. Re-checked against
 `0.1.1-rc.2`, where the `standard`, `code` and `cordis` compositions carry the
 same rows, so these figures still stand:
 
+On `0.1.1-rc.2`:
+
+| preset | tools | schema bytes | with a `fs:read` + `net:fetch` manifest | cut |
+|---|---|---|---|---|
+| `standard` (default) | 25 | 25,965 | 5 tools, 3,122 B | **88.0%** |
+| `code` | 26 | 26,908 | 6 tools, 4,065 B | 84.9% |
+| `cordis` | 32 | 33,453 | 5 tools, 3,122 B | 90.7% |
+
+On `0.1.0-rc.7`:
+
 | preset | tools | schema bytes | with a `fs:read` + `net:fetch` manifest | cut |
 |---|---|---|---|---|
 | `standard` (default) | 25 | 25,567 | 5 tools, 2,724 B | **89.3%** |
 | `code` | 26 | 26,510 | 6 tools, 3,667 B | 86.2% |
 | `cordis` | 32 | 33,055 | 5 tools, 2,724 B | 91.8% |
+
+Both are live captures. The versions differ because five tool packages edited
+their descriptions, and a tool schema is mostly its description — comparing
+package sources predicted no change here, and booting each version showed
+otherwise.
 
 Read honestly: that is the tool payload, not the whole request, and it applies
 to an agent genuinely scoped to what it declared — masking a general-purpose

@@ -118,10 +118,12 @@ overstates itself is worse than none, because people stop reading the code.
 Tool schemas are re-sent on every request, so a tool an agent may never call is
 paid for on every turn. A manifest already says which those are.
 
-Measured on a booted `@deepseek-ai/dsh` `0.1.0-rc.7` profile, the default
-`standard` preset carries 25 tools in 25,567 bytes; a manifest granting
-`fs:read` and `net:fetch` justifies 5 of them, at 2,724 bytes — an 89.3% cut to
-the tool payload. That is the tool payload and not the whole request, and it
+Measured on a booted `@deepseek-ai/dsh` `0.1.1-rc.2` profile, the default
+`standard` preset carries 25 tools in 25,965 bytes; a manifest granting
+`fs:read` and `net:fetch` justifies 5 of them, at 3,122 bytes — an 88.0% cut to
+the tool payload. On `0.1.0-rc.7` the same manifest cut 25,567 bytes to 2,724,
+or 89.3%; the versions differ because five tool packages edited their
+descriptions, and a schema is mostly its description. That is the tool payload and not the whole request, and it
 applies to an agent genuinely scoped to what it declared.
 
 Full numbers and how to reproduce them:
