@@ -239,9 +239,11 @@ export function parse(source: string): ParseResult {
       inFence = false
       continue
     }
-    const text = raw.trim()
-    // `#` is a comment inside a cap block, matching every config format the
-    // reader already knows.
+    // A trailing `#` comment is stripped before the directive is read.
+    // `capmark infer` annotates each proposed grant with the declaration that
+    // suggested it, and a grammar that rejected its own generator's output
+    // would be a grammar with a bug in it.
+    const text = raw.replace(/\s+#.*$/, '').trim()
     if (text === '' || text.startsWith('#')) continue
     parseDirective(text, line, out, errors)
   }

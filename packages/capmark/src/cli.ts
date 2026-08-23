@@ -10,6 +10,7 @@ import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { compile, TARGETS, type Target } from './compile.ts'
 import { discover } from './discover.ts'
+import { draft, infer } from './infer.ts'
 import { hasErrors, lint } from './lint.ts'
 import { parse } from './parse.ts'
 import { review, shouldRefuse } from './review.ts'
@@ -19,6 +20,7 @@ const USAGE = `capmark — capability manifests for agent plugins
 Usage:
   capmark lint [path]     check a CAP.md (default: ./CAP.md)
   capmark review <dir>    read what a plugin declares, before installing it
+  capmark infer <dir>     draft a CAP.md from what a plugin already declares
   capmark compile <path> --target <t>
                           restate a manifest where another spec expects it
                           (t: dsh, agent-plugins, skill)
@@ -180,6 +182,28 @@ export function main(argv: readonly string[]): number {
       return 2
     }
     return runCompile(resolveManifest(positional ?? 'CAP.md'), target as Target)
+  }
+
+  if (command === 'infer') {
+    if (positional === undefined) {
+      console.error('capmark infer needs a plugin directory')
+      return 2
+    }
+    const inference = infer(positional)
+    if (json) {
+      console.log(JSON.stringify(inference, null, 2))
+      return 0
+    }
+    // The draft goes to stdout alone so it can be redirected into CAP.md;
+    // everything a human needs to read goes to stderr.
+    process.stdout.write(draft(inference))
+    console.error(
+      `\n${inference.plugin ?? positional}: injects ${inference.injects.join(', ') || '(nothing)'}`,
+    )
+    console.error(
+      `proposed ${inference.proposed.length} grant(s). This is a draft from static declarations - review before committing.`,
+    )
+    return 0
   }
 
   if (command === 'review') {

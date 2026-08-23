@@ -48,6 +48,26 @@ CAP.md:7  warning advisory-scope               scope on `net:fetch` is recorded 
 CAP.md:8  error   grant-never-conflict         `proc:spawn` is granted on line 6 and forbidden here
 ```
 
+## Start from what the plugin already declares
+
+Nobody writes a manifest from a blank file. `infer` reads the services a plugin
+injects — a plain array at module level, no execution involved — and drafts one:
+
+```sh
+npx capmark infer ./node_modules/some-plugin > CAP.md
+```
+
+```
+grant plugins:manage  # injects `loader`
+```
+
+Every grant carries the declaration that suggested it, so you can disagree with
+the reason rather than just the answer. It is a **draft**: static reading sees
+what a plugin *can* reach, never what it does, and the emitted file says so in a
+comment that survives into the committed manifest. Services that carry authority
+capmark has no capability for are listed under **Not covered** rather than
+silently dropped — an empty section and an approving one must not look alike.
+
 ## Before you install something
 
 A gate holds an *agent* to a manifest. It cannot hold a *plugin*: `apply()` runs
