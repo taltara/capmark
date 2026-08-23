@@ -19,11 +19,16 @@ Submit the repo, not the npm page. HN readers want to read code.
 
 ## Text field
 
-Installing an AI agent plugin runs someone else's code with your permissions -
-it can read your files, use your credentials, and reach the network. The tools
-that exist today scan for known-bad code after the fact. Capmark is the other
-half: a plugin declares up front what it is allowed to do, in Markdown, and a
-checker holds it to that.
+I audited sixteen published DeepSeek Harness plugins. Ten read the filesystem,
+two open network connections, and none of them say so anywhere a machine can
+check. That is not a complaint about those plugins - a supply-chain scanner that
+reads files is doing its job, and everything in the sample looks reasonable. The
+problem is that the only way to find out is to read the source.
+
+Capmark is a way for a plugin to say up front what it is allowed to do, in
+Markdown, and a checker that holds it to that. Installing a plugin runs
+someone else's code with your permissions; the tools that exist today scan for
+known-bad code after the fact, and this is the other half.
 
 The design rule is that every capability has to name a mechanism that actually
 stops it. That came out of a bug report in the DeepSeek Harness community where
@@ -86,7 +91,14 @@ README where nothing implements it.
 
 **"89% of what?"** Of the tool schema payload, not the whole request. Say that
 before anyone has to ask twice - conversation history dwarfs it on a long
-session.
+session. On the current release it is 88.0%, because five tool packages edited
+their descriptions between versions; both captures are committed.
+
+**"Your audit is just grep."** Close enough to true to concede. It reads two
+static declarations - the `inject` array and Node builtin imports - and it says
+so. It cannot see `eval`, dynamic import, native addons, or what a dependency
+does. That is why the output is a draft for the author to correct rather than a
+verdict, and why a manifest is worth more than the audit that suggests one.
 
 Do not ask for upvotes anywhere. HN detects voting rings and penalises them
 hard, and asking in public is the fastest way to get a post killed.
